@@ -2,7 +2,24 @@
 name = "Rust-Ransomware"
 version = "0.1.0"
 edition = "2021"
+authors = ["amirooo amiran <amiran.amirhossein@gmail.com"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+base64ct = "*"
+byteorder = "*"
+chacha20 = "*"
+chacha20poly1305 = "*"
+clap = {version = "*", features = ["derive"]}
+flate2 = "*"
+hkdf = "*"
+p256 = {version="*", features = ["ecdh", "arithmetic", "pem"]}
+rand_chacha = "*"
+rayon = "*"
+sha2 = "*"
+walkdir = "*"
+
+[[bin]]
+name = "main"
+path = "src/main.rs"
