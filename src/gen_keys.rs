@@ -15,3 +15,12 @@ pub fn get_randomizer(seed: Option<[u8; 32]>) -> ChaChaRng {
         ChaChaRng::from_entropy()
     }
 }
+
+pub fn get_keypair(seed: Option<[u8; 32]>) -> (PrivateKey, PublicKey) {
+    let mut rng = get_randomizer(seed);
+
+    let private_key = PrivateKey::random(&mut rng);
+    let public_key = private_key.public_key();
+
+    (private_key, public_key)
+}
