@@ -1,3 +1,6 @@
+use std::fs::File;
+use std::io::{self, Write};
+
 use chacha20::Key;
 use hkdf::Hkdf;
 use p256::ecdh::diffie_hellman;
@@ -7,7 +10,9 @@ use p256::PublicKey;
 use p256::SecretKey as PrivateKey;
 use rand_chacha::rand_core::{RngCore, SeedableRng};
 use rand_chacha::ChaChaRng;
+use sha2::digest::Output;
 
+// 
 pub fn get_randomizer(seed: Option<[u8; 32]>) -> ChaChaRng {
     if let Some(seed) = seed{
         ChaChaRng::from_seed(seed)
@@ -16,6 +21,7 @@ pub fn get_randomizer(seed: Option<[u8; 32]>) -> ChaChaRng {
     }
 }
 
+// Generate a public and private key 
 pub fn get_keypair(seed: Option<[u8; 32]>) -> (PrivateKey, PublicKey) {
     let mut rng = get_randomizer(seed);
 
@@ -23,4 +29,41 @@ pub fn get_keypair(seed: Option<[u8; 32]>) -> (PrivateKey, PublicKey) {
     let public_key = private_key.public_key();
 
     (private_key, public_key)
+}
+
+// convart Bytes of the keys to pem format 
+pub fn dump_asym_keys(priv_key: &PrivateKey, pub_key: &PublicKey, out: Option<&str>) -> io::Result<()> {
+    let priv_pem_result = priv_key.to_pkcs8_pem(Default::default());
+    let pub_pem_result = pub_key.to_public_key_pem(Default::default());
+
+    let priv_pem = match priv_pem_result {
+        Ok(pem) => pem,
+        Err(err) => return Err(io::Error::new(io::ErrorKind::Other, format!("Failed to convert private key to PEM: {}", err))),
+    };
+
+    let pub_pem = match pub_pem_result {
+        Ok(pem) => pem,
+        Err(err) => return Err(io::Error::new(io::ErrorKind::Other, format!("Failed to convert public key to PEM: {}", err))),
+    };
+
+    let (mut priv_writer, mut pub_writer): (Box<dyn Write>, Box<dyn Write>) = match out {
+        Some(name) => {
+            let priv_file = format!("{}.priv", name);
+            let pub_file = format!("{}.pub", name);
+
+            (
+                Box::new(File::create(&priv_file)?),
+                Box::new(File::create(&pub_file)?),
+            )
+        }
+        None => (
+            Box::new(io::stdout()),
+            Box::new(io::stdout())
+        )
+    };
+
+    priv_writer.write_all(priv_pem.as_bytes())?;
+    pub_writer.write_all(pub_pem.as_bytes())?;
+
+    Ok(())
 }
