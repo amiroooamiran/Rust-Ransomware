@@ -29,7 +29,7 @@ In this article, the ChaCha20 cryptographic algorithm is examined in detail, fro
 | [algorithm Image](https://github.com/amiroooamiran/Rust-Ransomware/blob/master/documents/images/chacha20.png) | [Article Link](https://github.com/amiroooamiran/Rust-Ransomware/blob/master/documents/chacha%2020.pdf) | [in Rust](https://docs.rs/chacha20/latest/chacha20/) |
 
 <hr>
-### Unveiling the Mystery of Cross-Platform Rust Compilation: From Linux to Windows
+<h3> Unveiling the Mystery of Cross-Platform Rust Compilation: From Linux to Windows </h3>
 
 **Introduction**
 <br>
