@@ -94,3 +94,23 @@ pub fn import_asym_keys(priv_file: &str, pub_file: &str) -> (PrivateKey, PublicK
     let priv_key = PrivateKey::read_pkcs8_pem_file(priv_file).unwrap();
     (priv_key, pub_key)
 }
+
+/// Derives a symmetric key using Diffie-Hellman key exchange.
+/// Utilizes the private and public keys provided to derive a symmetric key
+/// through the Diffie-Hellman key exchange protocol. Returns the derived key.
+
+pub fn get_symmetric_key(priv_key: &PrivateKey, pub_key: &PublicKey) -> Key {
+    let salt = b"Version 1";
+    let info = b"For Educational Purposes Only!";
+    let shared_secret = diffie_hellman(priv_key.to_nonzero_scalar(), pub_key.as_affine());
+    let hkdf = shared_secret.extract::<sha2::Sha256>(Some(salt));
+    let mut key: [u8; 32] = [0; 32]; //256bit keys
+
+    hkdf.expand(info, &mut key).unwrap();
+
+    let rc = Key::clone_from_slice(&key);
+
+    key.zeroize();
+
+    rc
+}
