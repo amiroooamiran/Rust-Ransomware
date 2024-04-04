@@ -31,6 +31,7 @@ pub fn get_randomizer(seed: Option<[u8; 32]>) -> ChaChaRng {
 }
 
 // Generate a public and private key
+#[allow(dead_code)]
 pub fn get_keypair(seed: Option<[u8; 32]>) -> (PrivateKey, PublicKey) {
     let mut rng = get_randomizer(seed);
 
@@ -41,6 +42,7 @@ pub fn get_keypair(seed: Option<[u8; 32]>) -> (PrivateKey, PublicKey) {
 }
 
 // convart Bytes of the keys to pem format
+#[allow(dead_code)]
 pub fn dump_asym_keys(
     priv_key: &PrivateKey,
     pub_key: &PublicKey,
@@ -89,6 +91,7 @@ pub fn dump_asym_keys(
 }
 
 // Reads the private key from `priv_file` and the public key from `pub_file`
+#[allow(dead_code)]
 pub fn import_asym_keys(priv_file: &str, pub_file: &str) -> (PrivateKey, PublicKey) {
     let pub_key = PublicKey::read_public_key_pem_file(pub_file).unwrap();
     let priv_key = PrivateKey::read_pkcs8_pem_file(priv_file).unwrap();
@@ -98,13 +101,13 @@ pub fn import_asym_keys(priv_file: &str, pub_file: &str) -> (PrivateKey, PublicK
 /// Derives a symmetric key using Diffie-Hellman key exchange.
 /// Utilizes the private and public keys provided to derive a symmetric key
 /// through the Diffie-Hellman key exchange protocol. Returns the derived key.
-
+#[allow(dead_code)]
 pub fn get_symmetric_key(priv_key: &PrivateKey, pub_key: &PublicKey) -> Key {
     let salt = b"Version 1";
     let info = b"For Educational Purposes Only!";
     let shared_secret = diffie_hellman(priv_key.to_nonzero_scalar(), pub_key.as_affine());
     let hkdf = shared_secret.extract::<sha2::Sha256>(Some(salt));
-    let mut key: [u8; 32] = [0; 32]; //256bit keys
+    let mut key: [u8; 32] = [0; 32]; //256-bit keys
 
     hkdf.expand(info, &mut key).unwrap();
 
@@ -114,3 +117,5 @@ pub fn get_symmetric_key(priv_key: &PrivateKey, pub_key: &PublicKey) -> Key {
 
     rc
 }
+
+#[allow(dead_code)]
